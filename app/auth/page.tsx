@@ -1,9 +1,5 @@
-export const dynamic = 'force-dynamic';
-
-
-
 "use client";
-
+export const dynamic = 'force-dynamic';
 import { useAuth } from "@/context/auth-contexts";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
