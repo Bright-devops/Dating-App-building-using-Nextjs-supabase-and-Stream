@@ -75,27 +75,136 @@ export async function likeUser(toUserId: string) {
     throw new Error("Not authenticated.");
   }
 
-  const { error: likeError } = await supabase.from("likes").insert({
-    from_user_id: user.id,
-    to_user_id: toUserId,
-  });
+  // STEP 1: Check if this like already exists (prevent duplicate likes)
+  const { data: existingLikeCheck, error: existingCheckError } = await supabase
+    .from("likes")
+    .select("id")
+    .eq("from_user_id", user.id)
+    .eq("to_user_id", toUserId)
+    .maybeSingle();
 
-  if (likeError) {
-    throw new Error("Failed to create like");
+  if (existingCheckError) {
+    console.error("Error checking existing like:", {
+      message: existingCheckError.message,
+      details: existingCheckError.details,
+      hint: existingCheckError.hint,
+      code: existingCheckError.code,
+    });
+    throw new Error(`Database error: ${existingCheckError.message}`);
   }
 
+  // If like already exists, just check for match without inserting again
+  if (existingLikeCheck) {
+    console.log("Like already exists, checking for match...");
+    
+    // Check if the other user liked us back
+    const { data: mutualLike, error: mutualCheckError } = await supabase
+      .from("likes")
+      .select("*")
+      .eq("from_user_id", toUserId)
+      .eq("to_user_id", user.id)
+      .maybeSingle();
+
+    if (mutualCheckError) {
+      console.error("Error checking mutual like:", mutualCheckError);
+    }
+
+    if (mutualLike) {
+      // It's a match!
+      const { data: matchedUser, error: userError } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", toUserId)
+        .single();
+
+      if (userError) {
+        console.error("Error fetching matched user:", userError);
+        throw new Error("Failed to fetch matched user");
+      }
+
+      return {
+        success: true,
+        isMatch: true,
+        matchedUser: matchedUser as UserProfile,
+      };
+    }
+
+    return { success: true, isMatch: false };
+  }
+
+  // STEP 2: Insert the new like
+  const { data: insertedLike, error: likeError } = await supabase
+    .from("likes")
+    .insert({
+      from_user_id: user.id,
+      to_user_id: toUserId,
+    })
+    .select()
+    .single();
+
+  if (likeError) {
+    console.error("Detailed like insert error:", {
+      message: likeError.message,
+      details: likeError.details,
+      hint: likeError.hint,
+      code: likeError.code,
+      from_user_id: user.id,
+      to_user_id: toUserId,
+    });
+    
+    // Provide specific error messages based on error code
+    if (likeError.code === "23505") {
+      throw new Error("You've already liked this user");
+    } else if (likeError.code === "23503") {
+      throw new Error("Invalid user reference");
+    } else if (likeError.code === "42501") {
+      throw new Error("Permission denied. Please check your account settings.");
+    }
+    
+    throw new Error(`Failed to create like: ${likeError.message}`);
+  }
+
+  console.log("Like created successfully:", insertedLike);
+
+  // STEP 3: Check if the other user already liked us (mutual match)
   const { data: existingLike, error: checkError } = await supabase
     .from("likes")
     .select("*")
     .eq("from_user_id", toUserId)
     .eq("to_user_id", user.id)
-    .single();
+    .maybeSingle();
 
-  if (checkError && checkError.code !== "PGRST116") {
-    throw new Error("Failed to check for match");
+  if (checkError) {
+    console.error("Error checking for mutual match:", {
+      message: checkError.message,
+      details: checkError.details,
+      hint: checkError.hint,
+      code: checkError.code,
+    });
+    // Don't throw error here, just log it and continue
   }
 
+  // STEP 4: If mutual like exists, create a match and return the matched user
   if (existingLike) {
+    console.log("Mutual match found!");
+    
+    // Optional: Create a match record in a separate matches table
+    // This is useful for tracking active matches
+    const { error: matchError } = await supabase
+      .from("matches")
+      .insert({
+        user1_id: user.id,
+        user2_id: toUserId,
+        is_active: true,
+      })
+      .select()
+      .maybeSingle();
+
+    if (matchError && matchError.code !== "23505") {
+      // Ignore duplicate match errors (23505), log others
+      console.error("Error creating match record:", matchError);
+    }
+
     const { data: matchedUser, error: userError } = await supabase
       .from("users")
       .select("*")
@@ -103,6 +212,7 @@ export async function likeUser(toUserId: string) {
       .single();
 
     if (userError) {
+      console.error("Error fetching matched user details:", userError);
       throw new Error("Failed to fetch matched user");
     }
 
@@ -113,6 +223,7 @@ export async function likeUser(toUserId: string) {
     };
   }
 
+  // No match yet, just a successful like
   return { success: true, isMatch: false };
 }
 
@@ -133,6 +244,7 @@ export async function getUserMatches() {
     .eq("is_active", true);
 
   if (error) {
+    console.error("Error fetching matches:", error);
     throw new Error("Failed to fetch matches");
   }
 
@@ -149,6 +261,7 @@ export async function getUserMatches() {
       .single();
 
     if (userError) {
+      console.error("Error fetching user in match:", userError);
       continue;
     }
 

@@ -1,9 +1,11 @@
 "use client";
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
+
 import { useAuth } from "@/context/auth-contexts";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
@@ -17,7 +19,7 @@ export default function AuthPage() {
 
   useEffect(() => {
     if (user && !authLoading) {
-      router.push("/");
+      router.push("/matches");
     }
   }, [user, authLoading, router]);
 
