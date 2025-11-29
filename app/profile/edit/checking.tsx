@@ -24,8 +24,6 @@ import {
   ArrowLeft,
 } from "lucide-react";
 
-// import from ReelsUpload from "@/components/ReelsUpload";
-
 interface ExtendedFormData {
   full_name: string;
   username: string;
@@ -172,12 +170,12 @@ export default function EditProfilePage() {
             instagram: profileData.instagram || "",
             spotify: profileData.spotify || "",
             relationship_goals: profileData.relationship_goals || "",
-          preferences: {
-  age_range: profileData.preferences?.age_range || { min: 18, max: 35 },
-  distance: profileData.preferences?.distance || 50,
-  gender_preference: profileData.preferences?.gender_preference || [],
-  dealbreakers: profileData.preferences?.dealbreakers || [],
-},
+            preferences: profileData.preferences || {
+              age_range: { min: 18, max: 35 },
+              distance: 50,
+              gender_preference: [],
+              dealbreakers: [],
+            },
           });
         }
       } catch (err) {
@@ -371,31 +369,23 @@ export default function EditProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-red-50 dark:from-gray-900 dark:to-gray-800 py-8">
-      <div className="container mx-auto px-4 max-w-4xl">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            <span>Back</span>
-          </button>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Edit Profile</h1>
-          <div className="w-20"></div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8 px-4">
+      <div className="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+          Edit Your Profile
+        </h1>
 
         {/* Section Navigation */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-2 mb-6 flex gap-2 overflow-x-auto">
-          {["basic", "photos", "lifestyle", "interests", "prompts", "preferences"].map((section) => (
+        <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
+          {["interests", "prompts", "preferences"].map((section) => (
             <button
               key={section}
+              type="button"
               onClick={() => setActiveSection(section)}
-              className={`px-4 py-2 rounded-lg font-medium capitalize whitespace-nowrap transition-colors ${
+              className={`px-6 py-3 rounded-lg font-medium transition-colors capitalize whitespace-nowrap ${
                 activeSection === section
-                  ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
-                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  ? "bg-pink-500 text-white"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
               }`}
             >
               {section}
@@ -403,310 +393,8 @@ export default function EditProfilePage() {
           ))}
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-6">
-            {/* Basic Info Section */}
-            {activeSection === "basic" && (
-              <div className="space-y-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Basic Information</h2>
-
-                {/* Profile Picture */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
-                    Profile Picture
-                  </label>
-                  <div className="flex items-center gap-6">
-                    <div className="relative w-24 h-24 rounded-full overflow-hidden">
-                      <img
-                        src={formData.avatar_url || "/default-avatar.png"}
-                        alt="Profile"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <PhotoUpload
-                      onPhotoUploaded={(url) =>
-                        setFormData((prev) => ({ ...prev, avatar_url: url }))
-                      }
-                    />
-                  </div>
-                </div>
-
-                {/* Name and Username */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="full_name"
-                      value={formData.full_name}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Username *
-                    </label>
-                    <input
-                      type="text"
-                      name="username"
-                      value={formData.username}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
-                    />
-                  </div>
-                </div>
-
-                {/* Gender and Birthdate */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Gender *
-                    </label>
-                    <select
-                      name="gender"
-                      value={formData.gender}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
-                    >
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Birthdate *
-                    </label>
-                    <input
-                      type="date"
-                      name="birthdate"
-                      value={formData.birthdate}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
-                    />
-                  </div>
-                </div>
-
-                {/* Location, Occupation, Education */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      <MapPin className="w-4 h-4 inline mr-1" />
-                      Location
-                    </label>
-                    <input
-                      type="text"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
-                      placeholder="City, Country"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      <Briefcase className="w-4 h-4 inline mr-1" />
-                      Occupation
-                    </label>
-                    <input
-                      type="text"
-                      name="occupation"
-                      value={formData.occupation}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
-                      placeholder="Job title"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      <GraduationCap className="w-4 h-4 inline mr-1" />
-                      Education
-                    </label>
-                    <input
-                      type="text"
-                      name="education"
-                      value={formData.education}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
-                      placeholder="School/Degree"
-                    />
-                  </div>
-                </div>
-
-                {/* Height */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Height (cm)
-                  </label>
-                  <input
-                    type="number"
-                    name="height"
-                    value={formData.height}
-                    onChange={handleInputChange}
-                    min="100"
-                    max="250"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
-                  />
-                </div>
-
-                {/* Bio */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    About Me *
-                  </label>
-                  <textarea
-                    name="bio"
-                    value={formData.bio}
-                    onChange={handleInputChange}
-                    required
-                    rows={4}
-                    maxLength={500}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white resize-none"
-                    placeholder="Tell others about yourself..."
-                  />
-                  <p className="text-xs text-gray-500 mt-1">{formData.bio.length}/500 characters</p>
-                </div>
-
-                {/* Social Links */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      <Camera className="w-4 h-4 inline mr-1" />
-                      Instagram
-                    </label>
-                    <input
-                      type="text"
-                      name="instagram"
-                      value={formData.instagram}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
-                      placeholder="@username"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      <Music className="w-4 h-4 inline mr-1" />
-                      Spotify
-                    </label>
-                    <input
-                      type="text"
-                      name="spotify"
-                      value={formData.spotify}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
-                      placeholder="username"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Photos Section */}
-            {activeSection === "photos" && (
-              <div className="space-y-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Photo Gallery</h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {formData.photos.map((photo, idx) => (
-                    <div key={idx} className="relative aspect-square rounded-xl overflow-hidden group">
-                      <img src={photo} alt="" className="w-full h-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => removePhoto(photo)}
-                        className="absolute top-2 right-2 p-2 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <Trash2 className="w-4 h-4 text-white" />
-                      </button>
-                    </div>
-                  ))}
-                  <label className="aspect-square border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-pink-500 transition-colors">
-                    <Camera className="w-8 h-8 text-gray-400 mb-2" />
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Add Photos</span>
-                    <input
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={(e) => e.target.files && handlePhotoUpload(e.target.files)}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
-              </div>
-            )}
-
-            {/* Lifestyle Section */}
-            {activeSection === "lifestyle" && (
-              <div className="space-y-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Lifestyle</h2>
-                {Object.entries(LIFESTYLE_OPTIONS).map(([key, options]) => (
-                  <div key={key}>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 capitalize">
-                      {key}
-                    </label>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      {options.map((option) => (
-                        <button
-                          key={option}
-                          type="button"
-                          onClick={() => handleLifestyleChange(key as keyof typeof formData.lifestyle, option)}
-                          className={`px-4 py-2 rounded-lg border-2 transition-colors ${
-                            formData.lifestyle[key as keyof typeof formData.lifestyle] === option
-                              ? "border-pink-500 bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300"
-                              : "border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300"
-                          }`}
-                        >
-                          {option}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-
-                {/* Languages */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    <Globe className="w-4 h-4 inline mr-1" />
-                    Languages
-                  </label>
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {formData.languages.map((lang) => (
-                      <span
-                        key={lang}
-                        className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full text-sm flex items-center gap-2"
-                      >
-                        {lang}
-                        <button type="button" onClick={() => removeLanguage(lang)}>
-                          <X className="w-3 h-3" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={newLanguage}
-                      onChange={(e) => setNewLanguage(e.target.value)}
-                      onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addLanguage())}
-                      className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
-                      placeholder="Add a language"
-                    />
-                    <button
-                      type="button"
-                      onClick={addLanguage}
-                      className="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600"
-                    >
-                      <Plus className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
+        <div>
+          <div className="mb-8">
             {/* Interests Section */}
             {activeSection === "interests" && (
               <div className="space-y-6">
@@ -760,7 +448,6 @@ export default function EditProfilePage() {
             )}
 
             {/* Prompts Section */}
- {/* Prompts Section */}
             {activeSection === "prompts" && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between mb-6">
@@ -813,6 +500,7 @@ export default function EditProfilePage() {
                 ))}
               </div>
             )}
+
             {/* Preferences Section */}
             {activeSection === "preferences" && (
               <div className="space-y-6">
@@ -962,7 +650,7 @@ export default function EditProfilePage() {
 
           {/* Save Button */}
           <button
-            type="submit"
+            onClick={handleSubmit}
             disabled={saving}
             className="w-full py-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-xl font-semibold hover:from-pink-600 hover:to-purple-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
@@ -978,7 +666,7 @@ export default function EditProfilePage() {
               </>
             )}
           </button>
-        </form>
+        </div>
       </div>
     </div>
   );
