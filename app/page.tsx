@@ -24,7 +24,7 @@ export default function Home() {
             Meet people who share your story. Find love, connection, and community — your way.
           </p>
 
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
+          {/* <div className="flex flex-col sm:flex-row justify-center gap-4">
             <a
               href="http://localhost:3000/auth"
               className="bg-pink-600 hover:bg-pink-700 transition-colors px-6 py-3 rounded-full font-semibold text-base sm:text-lg shadow-lg"
@@ -37,7 +37,24 @@ export default function Home() {
             >
               Learn More
             </a>
+          </div> */}
+
+ <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <a
+              href="/auth"
+              className="bg-pink-600 hover:bg-pink-700 transition-colors px-6 py-3 rounded-full font-semibold text-base sm:text-lg shadow-lg"
+            >
+              Get Started
+            </a>
+            <a
+              href="#learnmore"
+              className="border border-white hover:bg-white hover:text-pink-600 transition-colors px-6 py-3 rounded-full font-semibold text-base sm:text-lg"
+            >
+              Learn More
+            </a>
           </div>
+
+          
         </div>
 
         {/* Tinder Glow */}
@@ -81,7 +98,8 @@ export default function Home() {
         <h2 className="text-3xl sm:text-4xl font-bold mb-4">Find Your Match Today</h2>
         <p className="mb-8 text-base sm:text-lg">Join thousands who've already found love on Lovistry.</p>
         <a
-          href="http://localhost:3000/auth"
+        // href="http://localhost:3000/auth"
+          href="/auth"
           className="inline-block bg-white text-pink-600 hover:bg-gray-100 transition-colors px-6 sm:px-8 py-3 rounded-full font-semibold text-base sm:text-lg shadow-lg"
         >
           Join Lovistry Free

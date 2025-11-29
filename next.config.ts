@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Remove output: 'export' line
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
@@ -12,13 +13,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "imljzgcuelzzzncfzlnc.supabase.co",
       },
-
-        {
+      {
         protocol: "https",
         hostname: "randomuser.me",
         pathname: "/api/portraits/**",
       },
-
       {
         protocol: "https",
         hostname: "images.unsplash.com",
